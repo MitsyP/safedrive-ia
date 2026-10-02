@@ -1,0 +1,37 @@
+<div class="supervisor-layout">
+  <aside class="sidebar">
+    <div class="brand"><span class="logo">🚌</span><h2>SafeDrive IA</h2></div>
+    <nav class="nav-menu">
+      <a href="#" id="menuDash" class="nav-item">📊 Panel General</a>
+      <a href="#" id="menuFlota" class="nav-item active">🚐 Unidades / Flota</a>
+      <a href="#" id="menuReportes" class="nav-item">📈 Reportes</a>
+      <a href="#" id="menuCentroIa" class="nav-item">⚡ Centro IA</a>
+    </nav>
+    <button id="btnSupervisorLogout" class="btn-logout">Cerrar Sesión</button>
+  </aside>
+
+  <main class="main-content">
+    <div class="top-bar">
+      <h1>Unidades / Flota (20 registradas)</h1>
+      <button class="btn-primary">+ Registrar Unidad</button>
+    </div>
+
+    <div class="units-grid">
+      <div class="unit-card">
+        <div class="u-header"><strong>Unidad 302-A</strong><span class="badge-status ok">Normal</span></div>
+        <p>J. Pérez Gómez (Turno mañana)</p>
+        <div class="u-meta"><span>2h 15m EN RUTA</span><span>1 ALERTA</span><span class="text-green">98% BATERÍA</span></div>
+      </div>
+      <div class="unit-card alert-border">
+        <div class="u-header"><strong>Unidad 302-B</strong><span class="badge-status fatiga">Fatiga</span></div>
+        <p>L. Ramos Quispe (Turno mañana)</p>
+        <div class="u-meta"><span>4h 40m EN RUTA</span><span class="text-red">3 ALERTAS</span><span>85% BATERÍA</span></div>
+      </div>
+      <div class="unit-card">
+        <div class="u-header"><strong>Unidad 302-C</strong><span class="badge-status ok">Normal</span></div>
+        <p>M. Ticona Flores (Turno tarde)</p>
+        <div class="u-meta"><span>1h 05m EN RUTA</span><span>0 ALERTAS</span><span class="text-green">100% BATERÍA</span></div>
+      </div>
+    </div>
+  </main>
+</div>

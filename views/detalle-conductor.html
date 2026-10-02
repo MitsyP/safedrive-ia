@@ -1,0 +1,40 @@
+<div class="supervisor-layout">
+  <aside class="sidebar">
+    <div class="brand"><span class="logo">🚌</span><h2>SafeDrive IA</h2></div>
+    <nav class="nav-menu">
+      <a href="#" id="menuDash" class="nav-item">📊 Panel General</a>
+      <a href="#" id="menuFlota" class="nav-item">🚐 Unidades / Flota</a>
+    </nav>
+    <button id="btnSupervisorLogout" class="btn-logout">Cerrar Sesión</button>
+  </aside>
+
+  <main class="main-content">
+    <div class="top-bar">
+      <div>
+        <h2>Juan Pérez Gómez — DNI: 76543210</h2>
+        <span class="badge en-ruta">Unidad 302-A · Turno Mañana · Activo</span>
+      </div>
+      <button id="btnVolverDash" class="btn-primary">⬅ Volver al Panel</button>
+    </div>
+
+    <div class="kpi-cards-grid">
+      <div class="kpi-card"><div><span class="title">ALERTAS ESTE MES</span><h3>9</h3></div></div>
+      <div class="kpi-card"><div><span class="title">HORAS MONITOREADAS</span><h3>142 h</h3></div></div>
+      <div class="kpi-card"><div><span class="title">TIEMPO REACCIÓN</span><h3>1.1 s</h3></div></div>
+      <div class="kpi-card"><div><span class="title">ANTIGÜEDAD</span><h3>2.5 años</h3></div></div>
+    </div>
+
+    <div class="panel-box mt-2">
+      <h3>Historial de Turnos Recientes</h3>
+      <table class="data-table">
+        <thead>
+          <tr><th>FECHA</th><th>UNIDAD</th><th>DURACIÓN</th><th>ALERTAS</th><th>ESTADO</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>09/09</td><td>302-A</td><td>8h 10m</td><td>1</td><td><span class="badge-status ok">Normal</span></td></tr>
+          <tr><td>08/09</td><td>302-A</td><td>7h 55m</td><td>2</td><td><span class="badge-status ok">Normal</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+</div>

@@ -1,0 +1,84 @@
+<div class="supervisor-layout">
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="logo">🚌</span>
+      <h2>SafeDrive IA</h2>
+    </div>
+    <nav class="nav-menu">
+      <a href="#" id="menuDash" class="nav-item active">📊 Panel General</a>
+      <a href="#" id="menuFlota" class="nav-item">🚐 Unidades / Flota</a>
+      <a href="#" id="menuDetalle" class="nav-item">👨‍✈️ Conductores</a>
+      <a href="#" id="menuReportes" class="nav-item">📈 Reportes</a>
+      <a href="#" id="menuCentroIa" class="nav-item">⚡ Centro IA</a>
+    </nav>
+    <button id="btnSupervisorLogout" class="btn-logout">Cerrar Sesión</button>
+  </aside>
+
+  <main class="main-content">
+    <div class="top-bar">
+      <div>
+        <h1>Panel de Supervisión de Flota</h1>
+        <p class="text-muted">ETSJL S.A.C. — Turno Actual en Tiempo Real</p>
+      </div>
+      <div class="user-profile">
+        <span class="avatar">MP</span>
+        <span>Mitsy Paz (Supervisor)</span>
+      </div>
+    </div>
+
+    <div class="kpi-cards-grid">
+      <div class="kpi-card">
+        <span class="kpi-icon">🚐</span>
+        <div><span class="title">UNIDADES ACTIVAS</span><h3>18/20</h3><small class="text-green">▲ 90% operativas</small></div>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-icon">⚠</span>
+        <div><span class="title">ALERTAS DE FATIGA HOY</span><h3 id="supKpiAlerts">5</h3><small class="text-red">2 críticas atendidas</small></div>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-icon">⏱</span>
+        <div><span class="title">TIEMPO REACCIÓN PROM.</span><h3>1.2 s</h3><small class="text-green">✔ Dentro del SLA</small></div>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-icon">👨‍✈️</span>
+        <div><span class="title">CONDUCTORES</span><h3>35</h3><small>100% monitoreados</small></div>
+      </div>
+    </div>
+
+    <div class="dashboard-split">
+      <div class="panel-box fleet-table-box">
+        <h3>Unidades en ruta — San Juan de Lurigancho</h3>
+        <table class="data-table">
+          <thead>
+            <tr><th>UNIDAD</th><th>CONDUCTOR</th><th>RUTA</th><th>ESTADO</th><th>ACCIÓN</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>302-A</strong></td><td>J. Pérez Gómez</td><td>SJL - Cercado</td>
+              <td><span class="badge-status ok">Normal</span></td>
+              <td><button class="btn-sm" id="btnVerConductor">Ver Perfil</button></td>
+            </tr>
+            <tr>
+              <td><strong>302-B</strong></td><td>L. Ramos Quispe</td><td>SJL - Cercado</td>
+              <td><span class="badge-status fatiga">Fatiga</span></td>
+              <td><button class="btn-sm">Alertar</button></td>
+            </tr>
+            <tr>
+              <td><strong>302-C</strong></td><td>M. Ticona Flores</td><td>Cercado - SJL</td>
+              <td><span class="badge-status ok">Normal</span></td>
+              <td><button class="btn-sm">Ver</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="panel-box log-box">
+        <h3>Feed de Alertas en Vivo</h3>
+        <ul class="activity-feed">
+          <li><span class="time">08:12</span><strong>Unidad 302-B:</strong> Microsueño detectado (3.2s)</li>
+          <li><span class="time">10:45</span><strong>Unidad 302-D:</strong> Bostezo frecuente detectado</li>
+        </ul>
+      </div>
+    </div>
+  </main>
+</div>

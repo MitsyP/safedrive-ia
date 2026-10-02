@@ -1,0 +1,55 @@
+<div class="mobile-container">
+  <header class="monitoring-header">
+    <div>
+      <h2>Monitoreo en vivo — Unidad 302-A</h2>
+      <span class="badge en-ruta">● EN RUTA</span>
+    </div>
+    <div id="aiStatusPill" class="badge">Iniciando IA...</div>
+  </header>
+
+  <div class="ear-grid">
+    <div class="metric-chip">EAR Izq: <span id="earLeft">0.00</span></div>
+    <div class="metric-chip">EAR Der: <span id="earRight">0.00</span></div>
+    <div class="metric-chip fps">FPS: 24</div>
+  </div>
+
+  <div class="camera-box">
+    <video id="webcam" autoplay playsinline muted></video>
+    <div id="alertOverlay" class="alert-overlay hidden">
+      ⚠ ¡ALERTA DE FATIGA DETECTADA!
+    </div>
+  </div>
+
+  <div class="cabina-stats">
+    <div class="stat-card">
+      <label>ESTADO ACTUAL</label>
+      <span id="driverStatus" class="status-ok">Normal</span>
+    </div>
+    <div class="stat-card">
+      <label>T. CONDUCIENDO</label>
+      <span id="driveTimer">00:00:00</span>
+    </div>
+    <div class="stat-card">
+      <label>ALERTAS HOY</label>
+      <span id="alertCount">0</span>
+    </div>
+  </div>
+
+  <div id="alertBanner" class="alert-banner normal">
+    <span class="icon">✔</span>
+    <div>
+      <strong>Nivel de alerta: BAJO</strong>
+      <p>Sin señales de fatiga detectadas</p>
+    </div>
+  </div>
+
+  <div class="bottom-nav">
+    <button id="btnNavMonitoreo" class="nav-tab active">📹 Monitoreo</button>
+    <button id="btnNavAlertas" class="nav-tab">🔔 Historial</button>
+    <button id="btnNavAjustes" class="nav-tab">⚙ Ajustes</button>
+  </div>
+
+  <button id="btnEndShift" class="btn-danger w-100 mt-2">
+    ⏹ Finalizar Turno de Manejo
+  </button>
+</div>
