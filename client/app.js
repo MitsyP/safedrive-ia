@@ -143,6 +143,25 @@ function bindEvents(viewName) {
       navigateTo("dashboard-supervisor");
     });
   }
+
+  if (viewName === "dashboard-supervisor") {
+  // Cargar alertas reales de la base de datos
+  fetch("http://localhost:8080/api/alertas")
+    .then(res => res.json())
+    .then(alertas => {
+      const feed = document.querySelector(".activity-feed");
+      const kpiAlerts = document.getElementById("supKpiAlerts");
+      if (kpiAlerts) kpiAlerts.innerText = alertas.length;
+
+      if (feed && alertas.length > 0) {
+        feed.innerHTML = alertas.slice(-5).reverse().map(a => {
+          const hora = a.fechaHora ? a.fechaHora.split("T")[1].substring(0, 5) : "--:--";
+          return `<li><span class="time">${hora}</span><strong>Unidad ${a.unidad}:</strong> ${a.tipoAlerta} detectado (EAR: ${a.earCalculado})</li>`;
+        }).join("");
+      }
+    })
+    .catch(err => console.warn("No se pudieron cargar alertas del servidor", err));
+}
 }
 
 // Iniciar aplicación
