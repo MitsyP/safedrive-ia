@@ -170,10 +170,26 @@ function triggerAlarm() {
     banner.innerHTML = `<span class="icon">⚠</span><div><strong>Nivel de alerta: CRÍTICO</strong><p>Microsueño detectado en cabina (> 2s)</p></div>`;
   }
 
+  // Reproducir sonido continuo de advertencia
   if (!alarmInterval) {
     beep();
     alarmInterval = setInterval(beep, 400);
   }
+
+  // Enviar el registro al backend Spring Boot y Supabase
+  fetch("http://localhost:8080/api/alertas", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      unidad: "302-A",
+      conductor: "J. Pérez Gómez",
+      tipoAlerta: "Microsueño",
+      earCalculado: 0.18
+    })
+  })
+  .then(res => res.json())
+  .then(data => console.log("Alerta sincronizada con el servidor:", data))
+  .catch(err => console.warn("Modo offline (servidor no disponible):", err));
 }
 
 function resetAlarm() {
