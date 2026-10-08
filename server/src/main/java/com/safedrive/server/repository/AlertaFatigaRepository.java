@@ -2,9 +2,17 @@ package com.safedrive.server.repository;
 
 import com.safedrive.server.model.AlertaFatiga;
 import org.springframework.data.jpa.repository.JpaRepository;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface AlertaFatigaRepository extends JpaRepository<AlertaFatiga, Long> {
-    // Método para obtener alertas por unidad (ej. "302-A")
+
+    // Obtener las últimas alertas ordenadas por fecha reciente
+    List<AlertaFatiga> findTop10ByOrderByFechaHoraDesc();
+
+    // Contar alertas ocurridas hoy
+    long countByFechaHoraAfter(LocalDateTime fecha);
+
+    // Obtener todas las alertas de una unidad específica
     List<AlertaFatiga> findByUnidadOrderByFechaHoraDesc(String unidad);
 }
