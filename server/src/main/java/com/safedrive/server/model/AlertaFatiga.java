@@ -12,13 +12,13 @@ public class AlertaFatiga {
     private Long id;
 
     @Column(nullable = false)
-    private String unidad; // Ej: "302-A"
+    private String unidad; 
 
     @Column(nullable = false)
-    private String conductor; // Ej: "J. Pérez Gómez"
+    private String conductor; 
 
     @Column(nullable = false)
-    private String tipoAlerta; // Ej: "Microsueño"
+    private String tipoAlerta; 
 
     private Double earCalculado; // Valor del EAR al disparar
 

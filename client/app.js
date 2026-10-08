@@ -145,6 +145,7 @@ function bindEvents(viewName) {
   }
 
   if (viewName === "dashboard-supervisor") {
+    
   // Cargar alertas reales de la base de datos
   fetch("http://localhost:8080/api/alertas")
     .then(res => res.json())
