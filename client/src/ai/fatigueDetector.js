@@ -7,15 +7,15 @@ let eyesClosedStart = null;
 let isFatigued = false;
 let alarmInterval = null;
 
-// Parámetros de detección
-const EAR_THRESHOLD = 0.22;       // Umbral de ojos cerrados
-const FATIGUE_MS = 2000;          // 2 segundos sostenidos
+// Paràmetres de detecció
+const EAR_THRESHOLD = 0.22;       // Umbral d'ulls tancats
+const FATIGUE_MS = 2000;          // 2 segons sostinguts
 
-// Índices anatómicos de los ojos en MediaPipe Face Mesh
+// Índexs anatòmics dels ulls a MediaPipe Face Mesh
 const LEFT_EYE = [33, 160, 158, 133, 153, 144];
 const RIGHT_EYE = [362, 385, 387, 263, 373, 380];
 
-// Sintetizador de audio Web Audio API (no requiere archivos mp3 externos)
+// Sintetitzador d'àudio Web Audio API
 let audioCtx = null;
 
 function getAudioContext() {
@@ -41,7 +41,7 @@ function beep() {
     osc.start();
     osc.stop(ctx.currentTime + 0.2);
   } catch (e) {
-    console.warn("Audio bloqueado por navegador hasta interacción de usuario", e);
+    console.warn("Àudio bloquejat pel navegador fins a la interacció de l'usuari", e);
   }
 }
 
@@ -56,18 +56,18 @@ export async function initAI() {
     );
     faceLandmarker = await FaceLandmarker.createFromOptions(resolver, {
       baseOptions: {
-        modelAssetPath: "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task",
-        delegate: "GPU"
+        modelAssetPath: "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task"
       },
       runningMode: "VIDEO",
       numFaces: 1
     });
+
     if (statusPill) {
       statusPill.innerText = "● IA Activa";
       statusPill.style.color = "#4ade80";
     }
   } catch (err) {
-    console.error("Error al inicializar MediaPipe:", err);
+    console.error("Error en inicialitzar MediaPipe:", err);
     if (statusPill) statusPill.innerText = "Error IA";
   }
 }
@@ -76,14 +76,36 @@ export async function startCamera() {
   const video = document.getElementById("webcam");
   if (!video) return;
 
+  // Assegurar que la IA està carregada abans de processar el vídeo
+  if (!faceLandmarker) {
+    await initAI();
+  }
+
   try {
     cameraStream = await navigator.mediaDevices.getUserMedia({
-      video: { width: 640, height: 480 }
+      video: true
     });
     video.srcObject = cameraStream;
-    video.addEventListener("loadeddata", runDetection);
+    
+    video.onloadedmetadata = () => {
+      video.play();
+      requestAnimationFrame(runDetection);
+    };
   } catch (err) {
-    alert("No se pudo acceder a la cámara frontal: " + err.message);
+    console.warn("Intent flexible fallit, intentant fallback bàsic:", err);
+    try {
+      cameraStream = await navigator.mediaDevices.getUserMedia({
+        video: { width: { ideal: 640 }, height: { ideal: 480 } }
+      });
+      video.srcObject = cameraStream;
+      
+      video.onloadedmetadata = () => {
+        video.play();
+        requestAnimationFrame(runDetection);
+      };
+    } catch (fallbackErr) {
+      alert("No s'ha pogut accedir a la càmera. Assegura't de tancar altres programes com OBS: " + fallbackErr.message);
+    }
   }
 }
 
@@ -112,25 +134,30 @@ function calcEAR(pts, idx) {
 
 function runDetection() {
   const video = document.getElementById("webcam");
-  if (!video || !cameraStream) return;
+  if (!video || !cameraStream || video.paused || video.ended) return;
 
-  if (lastVideoTime !== video.currentTime && faceLandmarker) {
+  if (faceLandmarker && lastVideoTime !== video.currentTime) {
     lastVideoTime = video.currentTime;
-    const res = faceLandmarker.detectForVideo(video, performance.now());
+    
+    try {
+      const res = faceLandmarker.detectForVideo(video, performance.now());
 
-    if (res.faceLandmarks && res.faceLandmarks.length > 0) {
-      const earL = calcEAR(res.faceLandmarks[0], LEFT_EYE);
-      const earR = calcEAR(res.faceLandmarks[0], RIGHT_EYE);
-      const avg = (earL + earR) / 2.0;
+      if (res.faceLandmarks && res.faceLandmarks.length > 0) {
+        const earL = calcEAR(res.faceLandmarks[0], LEFT_EYE);
+        const earR = calcEAR(res.faceLandmarks[0], RIGHT_EYE);
+        const avg = (earL + earR) / 2.0;
 
-      const earLVal = document.getElementById("earLeft");
-      const earRVal = document.getElementById("earRight");
-      if (earLVal) earLVal.innerText = earL.toFixed(2);
-      if (earRVal) earRVal.innerText = earR.toFixed(2);
+        const earLVal = document.getElementById("earLeft");
+        const earRVal = document.getElementById("earRight");
+        if (earLVal) earLVal.innerText = earL.toFixed(2);
+        if (earRVal) earRVal.innerText = earR.toFixed(2);
 
-      checkFatigue(avg);
-    } else {
-      resetAlarm();
+        checkFatigue(avg);
+      } else {
+        resetAlarm();
+      }
+    } catch (err) {
+      console.warn("Error durant la detecció del fotograma:", err);
     }
   }
 
@@ -170,20 +197,17 @@ function triggerAlarm(earVal = 0.18) {
     banner.innerHTML = `<span class="icon">⚠</span><div><strong>Nivel de alerta: CRÍTICO</strong><p>Microsueño detectado en cabina (> 2s)</p></div>`;
   }
 
-  // Reproducir sonido continuo de advertencia
   if (!alarmInterval) {
     beep();
     alarmInterval = setInterval(beep, 400);
   }
 
-  // Cargar datos dinámicos de la sesión activa
   const turnoId = parseInt(sessionStorage.getItem("turnoId") || "1");
   const unidadId = parseInt(sessionStorage.getItem("unidadId") || "1");
   const conductorId = parseInt(sessionStorage.getItem("conductorId") || "1");
   const codigoUnidad = sessionStorage.getItem("codigoUnidad") || "302-A";
   const nombreConductor = sessionStorage.getItem("nombreConductor") || "Juan Pérez Gómez";
 
-  // Enviar el registro al backend Spring Boot y Supabase
   fetch("http://localhost:8080/api/alertas", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
