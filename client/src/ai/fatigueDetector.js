@@ -176,15 +176,27 @@ function triggerAlarm(earVal = 0.18) {
     alarmInterval = setInterval(beep, 400);
   }
 
+  // Cargar datos dinámicos de la sesión activa
+  const turnoId = parseInt(sessionStorage.getItem("turnoId") || "1");
+  const unidadId = parseInt(sessionStorage.getItem("unidadId") || "1");
+  const conductorId = parseInt(sessionStorage.getItem("conductorId") || "1");
+  const codigoUnidad = sessionStorage.getItem("codigoUnidad") || "302-A";
+  const nombreConductor = sessionStorage.getItem("nombreConductor") || "Juan Pérez Gómez";
+
   // Enviar el registro al backend Spring Boot y Supabase
   fetch("http://localhost:8080/api/alertas", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      unidad: unidadActiva,
-      conductor: conductorActivo,
+      turnoId: turnoId,
+      unidadId: unidadId,
+      conductorId: conductorId,
+      unidad: codigoUnidad,
+      conductor: nombreConductor,
       tipoAlerta: "Microsueño",
-      earCalculado: parseFloat(earVal.toFixed(2))
+      valorEar: parseFloat(earVal.toFixed(2)),
+      duracionSegundos: 2.0,
+      tramoRuta: "Puente Nuevo"
     })
   })
   .then(res => res.json())

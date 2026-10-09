@@ -59,15 +59,18 @@ function bindEvents(viewName) {
 
     form?.addEventListener("submit", (e) => {
       e.preventDefault();
-      if (role === "conductor") navigateTo("onboarding");
-      else navigateTo("dashboard-supervisor");
-    });
-  }
+      if (role === "conductor") {
+        // Guardar sesión del conductor según tus datos semilla (Juan Pérez - ID: 1, Unidad 302-A - ID: 1)
+        sessionStorage.setItem("usuarioId", "1");
+        sessionStorage.setItem("conductorId", "1");
+        sessionStorage.setItem("unidadId", "1");
+        sessionStorage.setItem("nombreConductor", "Juan Pérez Gómez");
+        sessionStorage.setItem("codigoUnidad", "302-A");
 
-  // 2. ONBOARDING
-  if (viewName === "onboarding") {
-    document.getElementById("btnOnboardingStart")?.addEventListener("click", () => {
-      navigateTo("checklist");
+        navigateTo("onboarding");
+      } else {
+        navigateTo("dashboard-supervisor");
+      }
     });
   }
 
@@ -79,9 +82,9 @@ function bindEvents(viewName) {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            dniConductor: "76543210",
-            nombreConductor: "J. Pérez Gómez",
-            unidad: "302-A",
+            dniConductor: sessionStorage.getItem("dniConductor") || "76543210",
+            nombreConductor: sessionStorage.getItem("nombreConductor") || "Juan Pérez Gómez",
+            unidad: sessionStorage.getItem("codigoUnidad") || "302-A",
             ruta: "SJL → Cercado de Lima"
           })
         });
@@ -89,10 +92,15 @@ function bindEvents(viewName) {
         if (res.ok) {
           const turnoCreado = await res.json();
           currentTurnoId = turnoCreado.id;
+          sessionStorage.setItem("turnoId", currentTurnoId.toString());
           console.log(" Turno registrado en BD con ID:", currentTurnoId);
+        } else {
+          // Si el servidor responde pero falla la inserción, usar ID semilla por defecto
+          sessionStorage.setItem("turnoId", "1");
         }
       } catch (err) {
-        console.warn("Servidor offline: registrando turno localmente", err);
+        console.warn("Servidor offline: usando ID de turno por defecto", err);
+        sessionStorage.setItem("turnoId", "1");
       }
 
       shiftStartTime = new Date();
