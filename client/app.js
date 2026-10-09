@@ -3,16 +3,23 @@ import { initAI, startCamera, stopCamera } from "./src/ai/fatigueDetector.js";
 const viewport = document.getElementById("app-viewport");
 let shiftTimerInterval = null;
 let shiftStartTime = null;
+let supervisorPollingInterval = null;
 
 // Enrutador centralizado
 export async function navigateTo(viewName) {
   try {
-    // Si dejamos de monitorear, apagar cámara
+    // Si salimos de monitoreo, apagar cámara
     if (viewName !== "monitoreo") {
       stopCamera();
       if (shiftTimerInterval && viewName !== "fin-turno") {
         clearInterval(shiftTimerInterval);
       }
+    }
+
+    // Limpiar polling del supervisor si cambiamos a otra pantalla
+    if (viewName !== "dashboard-supervisor" && supervisorPollingInterval) {
+      clearInterval(supervisorPollingInterval);
+      supervisorPollingInterval = null;
     }
 
     const response = await fetch(`views/${viewName}.html`);
@@ -125,44 +132,88 @@ function bindEvents(viewName) {
     });
   }
 
-  // 8. SUPERVISOR (Menú lateral)
+  // 8. SUPERVISOR (Navegación del Menú Lateral)
   document.getElementById("menuDash")?.addEventListener("click", () => navigateTo("dashboard-supervisor"));
   document.getElementById("menuFlota")?.addEventListener("click", () => navigateTo("flota"));
   document.getElementById("menuReportes")?.addEventListener("click", () => navigateTo("reportes"));
   document.getElementById("menuCentroIa")?.addEventListener("click", () => navigateTo("centro-ia"));
   document.getElementById("btnSupervisorLogout")?.addEventListener("click", () => navigateTo("login"));
 
-  if (viewName === "dashboard-supervisor") {
-    document.getElementById("btnVerConductor")?.addEventListener("click", () => {
-      navigateTo("detalle-conductor");
-    });
-  }
-
+  // 9. VISTA DETALLE CONDUCTOR
   if (viewName === "detalle-conductor") {
     document.getElementById("btnVolverDash")?.addEventListener("click", () => {
       navigateTo("dashboard-supervisor");
     });
   }
 
+  // 10. DASHBOARD SUPERVISOR (Consumo de datos reales desde Spring Boot)
   if (viewName === "dashboard-supervisor") {
-    
-  // Cargar alertas reales de la base de datos
-  fetch("http://localhost:8080/api/alertas")
-    .then(res => res.json())
-    .then(alertas => {
-      const feed = document.querySelector(".activity-feed");
-      const kpiAlerts = document.getElementById("supKpiAlerts");
-      if (kpiAlerts) kpiAlerts.innerText = alertas.length;
+    document.getElementById("btnVerConductor")?.addEventListener("click", () => {
+      navigateTo("detalle-conductor");
+    });
 
-      if (feed && alertas.length > 0) {
-        feed.innerHTML = alertas.slice(-5).reverse().map(a => {
-          const hora = a.fechaHora ? a.fechaHora.split("T")[1].substring(0, 5) : "--:--";
-          return `<li><span class="time">${hora}</span><strong>Unidad ${a.unidad}:</strong> ${a.tipoAlerta} detectado (EAR: ${a.earCalculado})</li>`;
-        }).join("");
+    // Función asíncrona para consultar el resumen consolidado
+    async function sincronizarDashboardSupervisor() {
+      try {
+        const res = await fetch("http://localhost:8080/api/alertas/dashboard-resumen");
+        if (!res.ok) throw new Error("Error en servidor Spring Boot");
+
+        const data = await res.json();
+
+        // A. Actualizar KPI numérico de alertas de hoy
+        const kpiAlerts = document.getElementById("supKpiAlerts");
+        if (kpiAlerts) kpiAlerts.innerText = data.totalAlertasHoy;
+
+        // B. Renderizar la tabla de flota con datos de cada unidad
+        const tbody = document.getElementById("tablaFlotaBody");
+        if (tbody && data.flota) {
+          tbody.innerHTML = data.flota.map(item => `
+            <tr>
+              <td><strong>${item.unidad}</strong></td>
+              <td>${item.conductor}</td>
+              <td>${item.ruta}</td>
+              <td>
+                <span class="badge-status ${item.estado === 'Fatiga' ? 'fatiga' : 'ok'}">
+                  ${item.estado}
+                </span>
+              </td>
+              <td>
+                <button class="btn-sm" onclick="alert('Unidad: ${item.unidad}\\nConductor: ${item.conductor}\\nTotal Alertas Registradas: ${item.totalAlertas}')">
+                  Ver Estado
+                </button>
+              </td>
+            </tr>
+          `).join("");
+        }
+
+        // C. Renderizar feed de incidentes en tiempo real
+        const feed = document.getElementById("feedAlertasSupervisor");
+        if (feed && data.ultimasAlertas) {
+          if (data.ultimasAlertas.length === 0) {
+            feed.innerHTML = "<li style='color:#8fa0c0;'>No hay alertas de fatiga registradas hoy.</li>";
+          } else {
+            feed.innerHTML = data.ultimasAlertas.map(a => {
+              const hora = a.fechaHora ? a.fechaHora.split("T")[1].substring(0, 5) : "--:--";
+              return `
+                <li>
+                  <span class="time">${hora}</span>
+                  <strong>Unidad ${a.unidad}:</strong> ${a.tipoAlerta} detectado (EAR: ${a.earCalculado})
+                </li>
+              `;
+            }).join("");
+          }
+        }
+      } catch (error) {
+        console.warn("Spring Boot no disponible o en proceso de carga:", error);
       }
-    })
-    .catch(err => console.warn("No se pudieron cargar alertas del servidor", err));
-}
+    }
+
+    // Primera carga al entrar al panel
+    sincronizarDashboardSupervisor();
+
+    // Actualización automática cada 3 segundos para refresco en vivo
+    supervisorPollingInterval = setInterval(sincronizarDashboardSupervisor, 3000);
+  }
 }
 
 // Iniciar aplicación

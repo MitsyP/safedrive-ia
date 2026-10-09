@@ -33,7 +33,7 @@
       </div>
       <div class="kpi-card">
         <span class="kpi-icon">⚠</span>
-        <div><span class="title">ALERTAS DE FATIGA HOY</span><h3 id="supKpiAlerts">5</h3><small class="text-red">2 críticas atendidas</small></div>
+        <div><span class="title">ALERTAS DE FATIGA HOY</span><h3 id="supKpiAlerts">0</h3><small class="text-red">Críticas registradas</small></div>
       </div>
       <div class="kpi-card">
         <span class="kpi-icon">⏱</span>
@@ -52,21 +52,10 @@
           <thead>
             <tr><th>UNIDAD</th><th>CONDUCTOR</th><th>RUTA</th><th>ESTADO</th><th>ACCIÓN</th></tr>
           </thead>
-          <tbody>
+          <!-- CAMBIO 1: El cuerpo ahora tiene ID para recibir los datos de Spring Boot -->
+          <tbody id="tablaFlotaBody">
             <tr>
-              <td><strong>302-A</strong></td><td>J. Pérez Gómez</td><td>SJL - Cercado</td>
-              <td><span class="badge-status ok">Normal</span></td>
-              <td><button class="btn-sm" id="btnVerConductor">Ver Perfil</button></td>
-            </tr>
-            <tr>
-              <td><strong>302-B</strong></td><td>L. Ramos Quispe</td><td>SJL - Cercado</td>
-              <td><span class="badge-status fatiga">Fatiga</span></td>
-              <td><button class="btn-sm">Alertar</button></td>
-            </tr>
-            <tr>
-              <td><strong>302-C</strong></td><td>M. Ticona Flores</td><td>Cercado - SJL</td>
-              <td><span class="badge-status ok">Normal</span></td>
-              <td><button class="btn-sm">Ver</button></td>
+              <td colspan="5" style="text-align: center; color: #8fa0c0;">Cargando unidades desde la base de datos...</td>
             </tr>
           </tbody>
         </table>
@@ -74,9 +63,9 @@
 
       <div class="panel-box log-box">
         <h3>Feed de Alertas en Vivo</h3>
-        <ul class="activity-feed">
-          <li><span class="time">08:12</span><strong>Unidad 302-B:</strong> Microsueño detectado (3.2s)</li>
-          <li><span class="time">10:45</span><strong>Unidad 302-D:</strong> Bostezo frecuente detectado</li>
+        <!-- CAMBIO 2: La lista ahora tiene ID para recibir las alertas en tiempo real -->
+        <ul class="activity-feed" id="feedAlertasSupervisor">
+          <li style="color: #8fa0c0;">Cargando alertas recientes...</li>
         </ul>
       </div>
     </div>
