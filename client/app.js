@@ -49,25 +49,24 @@ function bindEvents(viewName) {
     btnCond?.addEventListener("click", () => {
       role = "conductor";
       btnCond.classList.add("active");
-      btnSup.classList.remove("active");
+      btnSup?.classList.remove("active");
     });
+
     btnSup?.addEventListener("click", () => {
       role = "supervisor";
       btnSup.classList.add("active");
-      btnCond.classList.remove("active");
+      btnCond?.classList.remove("active");
     });
 
-    form?.addEventListener("submit", (e) => {
+    form?.addEventListener("submit", async (e) => {
       e.preventDefault();
 
-      //  lee los inputs en login.html
       const inputDni = document.getElementById("inputDni") || document.querySelector("input[type='text']");
       const inputPassword = document.getElementById("inputPassword") || document.querySelector("input[type='password']");
 
       const dni = inputDni ? inputDni.value.trim() : "";
       const password = inputPassword ? inputPassword.value.trim() : "";
 
-      // Si los campos están vacíos, usar credenciales semilla de prueba
       const dniFinal = dni || (role === "conductor" ? "76543210" : "10457812");
       const passwordFinal = password || (role === "conductor" ? "123456" : "admin123");
 
@@ -77,7 +76,8 @@ function bindEvents(viewName) {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ dni: dniFinal, password: passwordFinal })
         });
-if (res.ok) {
+
+        if (res.ok) {
           const data = await res.json();
           console.log("✅ Sesión autenticada en PostgreSQL/Supabase:", data);
 
@@ -102,7 +102,7 @@ if (res.ok) {
         console.warn("Servidor Spring Boot offline: continuando en modo demo local.", err);
       }
 
-      // Fallback seguro (Modo Demo Local)
+      // Fallback si la API no está lista
       sessionStorage.setItem("usuarioId", "1");
       sessionStorage.setItem("conductorId", "1");
       sessionStorage.setItem("unidadId", "1");
