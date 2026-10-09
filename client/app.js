@@ -4,6 +4,7 @@ const viewport = document.getElementById("app-viewport");
 let shiftTimerInterval = null;
 let shiftStartTime = null;
 let supervisorPollingInterval = null;
+let currentTurnoId = null;
 
 // Enrutador centralizado
 export async function navigateTo(viewName) {
@@ -72,7 +73,28 @@ function bindEvents(viewName) {
 
   // 3. CHECKLIST
   if (viewName === "checklist") {
-    document.getElementById("btnStartShift")?.addEventListener("click", () => {
+    document.getElementById("btnStartShift")?.addEventListener("click", async () => {
+      try {
+        const res = await fetch("http://localhost:8080/api/turnos/inicio", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            dniConductor: "76543210",
+            nombreConductor: "J. Pérez Gómez",
+            unidad: "302-A",
+            ruta: "SJL → Cercado de Lima"
+          })
+        });
+
+        if (res.ok) {
+          const turnoCreado = await res.json();
+          currentTurnoId = turnoCreado.id;
+          console.log(" Turno registrado en BD con ID:", currentTurnoId);
+        }
+      } catch (err) {
+        console.warn("Servidor offline: registrando turno localmente", err);
+      }
+
       shiftStartTime = new Date();
       navigateTo("monitoreo");
     });
@@ -95,7 +117,17 @@ function bindEvents(viewName) {
       }, 1000);
     }
 
-    document.getElementById("btnEndShift")?.addEventListener("click", () => {
+    document.getElementById("btnEndShift")?.addEventListener("click", async () => {
+      if (currentTurnoId) {
+        try {
+          await fetch(`http://localhost:8080/api/turnos/${currentTurnoId}/fin`, {
+            method: "PUT"
+          });
+          console.log(" Turno finalizado correctamente en BD");
+        } catch (err) {
+          console.warn("Error al finalizar turno en servidor", err);
+        }
+      }
       navigateTo("fin-turno");
     });
     document.getElementById("btnNavAlertas")?.addEventListener("click", () => {

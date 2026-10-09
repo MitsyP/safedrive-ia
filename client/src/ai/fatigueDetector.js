@@ -142,14 +142,14 @@ function checkFatigue(ear) {
   if (ear < EAR_THRESHOLD) {
     if (!eyesClosedStart) eyesClosedStart = now;
     else if (now - eyesClosedStart >= FATIGUE_MS && !isFatigued) {
-      triggerAlarm();
+      triggerAlarm(ear);
     }
   } else {
     resetAlarm();
   }
 }
 
-function triggerAlarm() {
+function triggerAlarm(earVal = 0.18) {
   isFatigued = true;
   document.getElementById("alertOverlay")?.classList.remove("hidden");
   
@@ -181,15 +181,15 @@ function triggerAlarm() {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      unidad: "302-A",
-      conductor: "J. Pérez Gómez",
+      unidad: unidadActiva,
+      conductor: conductorActivo,
       tipoAlerta: "Microsueño",
-      earCalculado: 0.18
+      earCalculado: parseFloat(earVal.toFixed(2))
     })
   })
   .then(res => res.json())
-  .then(data => console.log("Alerta sincronizada con el servidor:", data))
-  .catch(err => console.warn("Modo offline (servidor no disponible):", err));
+  .then(data => console.log("Alerta registrada:", data))
+  .catch(err => console.warn("Error al enviar alerta:", err));
 }
 
 function resetAlarm() {
