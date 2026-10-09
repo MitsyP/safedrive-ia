@@ -59,14 +59,57 @@ function bindEvents(viewName) {
 
     form?.addEventListener("submit", (e) => {
       e.preventDefault();
-      if (role === "conductor") {
-        // Guardar sesión del conductor según tus datos semilla (Juan Pérez - ID: 1, Unidad 302-A - ID: 1)
-        sessionStorage.setItem("usuarioId", "1");
-        sessionStorage.setItem("conductorId", "1");
-        sessionStorage.setItem("unidadId", "1");
-        sessionStorage.setItem("nombreConductor", "Juan Pérez Gómez");
-        sessionStorage.setItem("codigoUnidad", "302-A");
 
+      //  lee los inputs en login.html
+      const inputDni = document.getElementById("inputDni") || document.querySelector("input[type='text']");
+      const inputPassword = document.getElementById("inputPassword") || document.querySelector("input[type='password']");
+
+      const dni = inputDni ? inputDni.value.trim() : "";
+      const password = inputPassword ? inputPassword.value.trim() : "";
+
+      // Si los campos están vacíos, usar credenciales semilla de prueba
+      const dniFinal = dni || (role === "conductor" ? "76543210" : "10457812");
+      const passwordFinal = password || (role === "conductor" ? "123456" : "admin123");
+
+      try {
+        const res = await fetch("http://localhost:8080/api/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ dni: dniFinal, password: passwordFinal })
+        });
+if (res.ok) {
+          const data = await res.json();
+          console.log("✅ Sesión autenticada en PostgreSQL/Supabase:", data);
+
+          sessionStorage.setItem("usuarioId", data.id);
+          sessionStorage.setItem("dniConductor", data.dni);
+          sessionStorage.setItem("nombreConductor", data.nombreCompleto);
+          sessionStorage.setItem("rol", data.rol);
+          sessionStorage.setItem("conductorId", "1");
+          sessionStorage.setItem("unidadId", "1");
+          sessionStorage.setItem("codigoUnidad", "302-A");
+
+          if (data.rol === "supervisor") {
+            navigateTo("dashboard-supervisor");
+          } else {
+            navigateTo("onboarding");
+          }
+          return;
+        } else {
+          console.warn("Credenciales no válidas en BD, ingresando en modo demo local.");
+        }
+      } catch (err) {
+        console.warn("Servidor Spring Boot offline: continuando en modo demo local.", err);
+      }
+
+      // Fallback seguro (Modo Demo Local)
+      sessionStorage.setItem("usuarioId", "1");
+      sessionStorage.setItem("conductorId", "1");
+      sessionStorage.setItem("unidadId", "1");
+      sessionStorage.setItem("nombreConductor", role === "conductor" ? "Juan Pérez Gómez" : "Mitsy Paz Mendoza");
+      sessionStorage.setItem("codigoUnidad", "302-A");
+
+      if (role === "conductor") {
         navigateTo("onboarding");
       } else {
         navigateTo("dashboard-supervisor");
