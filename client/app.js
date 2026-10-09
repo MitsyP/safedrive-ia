@@ -117,6 +117,17 @@ function bindEvents(viewName) {
     });
   }
 
+    // 2. ONBOARDING
+  if (viewName === "onboarding") {
+    const btnStart = document.getElementById("btnOnboardingStart");
+    if (btnStart) {
+      btnStart.onclick = (e) => {
+        e.preventDefault();
+        navigateTo("checklist");
+      };
+    }
+  }
+  
   // 3. CHECKLIST
   if (viewName === "checklist") {
     document.getElementById("btnStartShift")?.addEventListener("click", async () => {
